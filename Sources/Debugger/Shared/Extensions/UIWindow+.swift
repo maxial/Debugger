@@ -31,6 +31,7 @@ extension UIWindow {
         }
         
         if UIWindow._debuggerWindow == nil || UIWindow._debuggerWindow?.isHidden == true {
+            endEditing(true)
             UIWindow.updateDebuggerVisibility(true)
         }
     }

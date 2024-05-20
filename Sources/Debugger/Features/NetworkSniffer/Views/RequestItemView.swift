@@ -36,7 +36,7 @@ struct RequestItemView: View {
 #Preview {
     RequestItemView(
         requestModel: RequestModel(
-            request: NSURLRequest(url: URL(string: "google.com")!),
+            request: URLRequest(url: URL(string: "google.com")!),
             session: nil
         )
     )

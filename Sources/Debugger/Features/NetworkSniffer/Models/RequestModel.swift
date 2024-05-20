@@ -24,7 +24,7 @@ final class RequestModel: ObservableObject, Identifiable {
     @Published var sentBytes: Int64?
     @Published var receivedBytes: Int64?
     
-    init(request: NSURLRequest, session: URLSession?) {
+    init(request: URLRequest, session: URLSession?) {
         id = UUID().uuidString
         url = request.url
         date = Date()

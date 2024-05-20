@@ -35,15 +35,17 @@ final class DebugHTTPProtocol: URLProtocol {
     }
     
     override func startLoading() {
-        guard var newRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest else {
+        guard var mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest else {
             return
         }
         
+        DebugHTTPProtocol.setProperty(true, forKey: String(describing: Self.self), in: mutableRequest)
+        
+        var newRequest = mutableRequest as URLRequest
+        
         Debugger.shared.applyDebugSettings(to: &newRequest)
         
-        DebugHTTPProtocol.setProperty(true, forKey: String(describing: Self.self), in: newRequest)
-        
-        sessionTask = session?.dataTask(with: newRequest as URLRequest)
+        sessionTask = session?.dataTask(with: newRequest)
         sessionTask?.resume()
         
         currentRequest = RequestModel(request: newRequest, session: session)
@@ -83,9 +85,14 @@ final class DebugHTTPProtocol: URLProtocol {
 
 extension DebugHTTPProtocol: URLSessionDataDelegate {
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        client?.urlProtocol(self, didLoad: data)
-        
         currentRequest?.saveDataResponse(data: data)
+        
+        if
+            let request = dataTask.originalRequest,
+            Debugger.shared.isResponseWillBeModified(for: request) == false
+        {
+            client?.urlProtocol(self, didLoad: data)
+        }
     }
     
     func urlSession(
@@ -107,7 +114,30 @@ extension DebugHTTPProtocol: URLSessionDataDelegate {
             currentRequest?.saveError(error.localizedDescription)
             
             client?.urlProtocol(self, didFailWithError: error)
+            
+            if let request = task.originalRequest, Debugger.shared.isResponseWillBeModified(for: request) {
+                print("DEBBUG: ERROR")
+            }
         } else {
+            if let request = task.originalRequest, Debugger.shared.isResponseWillBeModified(for: request) {
+                if var responseData = currentRequest?.dataResponse {
+                    Debugger.shared.applyDebugSettings(to: &responseData, on: request)
+                    
+                    print("DEBBUG: ALL GOOD")
+                    client?.urlProtocol(self, didLoad: responseData)
+                } else {
+                    print(currentRequest == nil ? "DEBBUG: nil currentRequest" : "DEBBUG: EMPTY RESPONSE")
+                }
+            } else {
+                if let request = task.originalRequest {
+                    if Debugger.shared.isResponseWillBeModified(for: request) == false {
+                        print("DEBBUG: Will NOT BeModified")
+                    }
+                } else {
+                    print("DEBBUG: originalRequest nil")
+                }
+            }
+            
             client?.urlProtocolDidFinishLoading(self)
         }
     }
@@ -120,6 +150,7 @@ extension DebugHTTPProtocol: URLSessionDataDelegate {
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         client?.urlProtocol(self, wasRedirectedTo: request, redirectResponse: response)
+        
         completionHandler(request)
     }
     

@@ -31,13 +31,6 @@ struct ConfigurationEditRuleView: View {
                     isValueEditable: true
                 )
                 
-                Picker("Modify", selection: $viewModel.rule.type) {
-                    ForEach(DebuggerConfigurationRuleType.allCases) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-                .pickerStyle(.menu)
-                
                 ForEach(viewModel.rule.matchingParams.indices, id: \.self) { i in
                     KeyValueView(
                         key: $viewModel.rule.matchingParams[i].key,
@@ -69,15 +62,29 @@ struct ConfigurationEditRuleView: View {
             }
             
             Section {
-                ForEach(viewModel.rule.updatingParams.indices, id: \.self) { i in
-                    KeyValueView(
-                        key: $viewModel.rule.updatingParams[i].key,
-                        value: $viewModel.rule.updatingParams[i].value.value,
-                        isKeyEditable: true,
-                        isValueEditable: true
-                    )
+                Picker("Modify", selection: $viewModel.rule.type) {
+                    ForEach(DebuggerConfigurationRuleType.allCases) {
+                        Text($0.rawValue).tag($0)
+                    }
                 }
-                .onDelete(perform: removeUpdatingParams)
+                .pickerStyle(.menu)
+                
+                switch viewModel.rule.type {
+                case .requestBody:
+                    ForEach(viewModel.rule.updatingParams.indices, id: \.self) { i in
+                        KeyValueView(
+                            key: $viewModel.rule.updatingParams[i].key,
+                            value: $viewModel.rule.updatingParams[i].value.value,
+                            isKeyEditable: true,
+                            isValueEditable: true
+                        )
+                    }
+                    .onDelete(perform: removeUpdatingParams)
+                case .responseBody:
+                    TextEditor(text: $viewModel.rule.updatingResponse)
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 14))
+                }
             } header: {
                 HStack {
                     Text("Updating")

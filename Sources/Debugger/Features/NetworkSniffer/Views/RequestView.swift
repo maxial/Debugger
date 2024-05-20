@@ -83,7 +83,7 @@ struct RequestView: View {
 #Preview {
     RequestView(
         requestModel: RequestModel(
-            request: NSURLRequest(url: URL(string: "google.com")!),
+            request: URLRequest(url: URL(string: "google.com")!),
             session: nil
         )
     )

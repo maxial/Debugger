@@ -11,6 +11,10 @@ enum DebuggerConfigurationRuleType: String, Identifiable, CaseIterable, Codable 
     var id: String { rawValue }
     
     case requestBody = "Request Body"
+    case responseBody = "Response Body"
+    
+    var isRequestType: Bool { self == .requestBody }
+    var isResponseType: Bool { self == .responseBody }
 }
 
 struct ConfigurationRuleParameter: Codable, Identifiable {
@@ -26,5 +30,6 @@ public struct DebuggerConfigurationRule: Codable, Identifiable {
     var path: String = ""
     var matchingParams: [ConfigurationRuleParameter] = []
     var updatingParams: [ConfigurationRuleParameter] = []
+    var updatingResponse: String = ""
     var isEnabled = true
 }

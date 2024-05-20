@@ -7,10 +7,16 @@
 
 import SwiftUI
 
-public typealias ApplyCustomModification = ((
-    _ request: inout NSMutableURLRequest,
-    _ customRules: [DebuggerConfigurationRule]?) -> Void
-)
+public typealias ApplyCustomRequestModification = (
+    _ customRules: [DebuggerConfigurationRule]?,
+    _ request: inout URLRequest
+) -> Void
+
+public typealias ApplyCustomResponseModification = (
+    _ customRules: [DebuggerConfigurationRule]?,
+    _ responseData: inout Data,
+    _ request: URLRequest
+) -> Void
 
 public final class Debugger: NSObject, ObservableObject {
     static let shared = Debugger()
@@ -23,8 +29,9 @@ public final class Debugger: NSObject, ObservableObject {
     @Published var animationControlViewModel: AnimationControlViewModel
     @Published var systemDebuggerViewModel: SystemDebuggerViewModel
     
-    private var requestModifierService: RequestModifierService
-    private var applyCustomModification: ApplyCustomModification?
+    private var networkModifierService: NetworkModifierService
+    private var applyCustomRequestModification: ApplyCustomRequestModification?
+    private var applyCustomResponseModification: ApplyCustomResponseModification?
     
     init(
         configurationSwitcherViewModel: ConfigurationSwitcherViewModel = ConfigurationSwitcherViewModel(),
@@ -32,28 +39,32 @@ public final class Debugger: NSObject, ObservableObject {
         viewInspectorViewModel: ViewInspectorViewModel = ViewInspectorViewModel(),
         animationControlViewModel: AnimationControlViewModel = AnimationControlViewModel(),
         systemDebuggerViewModel: SystemDebuggerViewModel = SystemDebuggerViewModel(),
-        requestModifierService: RequestModifierService = RequestModifierService()
+        networkModifierService: NetworkModifierService = NetworkModifierService()
     ) {
         self.configurationSwitcherViewModel = configurationSwitcherViewModel
         self.networkSnifferViewModel = networkSnifferViewModel
         self.viewInspectorViewModel = viewInspectorViewModel
         self.animationControlViewModel = animationControlViewModel
         self.systemDebuggerViewModel = systemDebuggerViewModel
-        self.requestModifierService = requestModifierService
+        self.networkModifierService = networkModifierService
     }
     
     public static func setup(
         ignoreHosts: [String] = [],
         onConfigurationSwitched: (() -> Void)? = nil,
-        applyCustomModification: ApplyCustomModification? = nil
+        applyCustomRequestModification: ApplyCustomRequestModification? = nil,
+        applyCustomResponseModification: ApplyCustomResponseModification? = nil
     ) {
         shared.isDebuggerEnabled = true
         
         URLSessionConfiguration.setupSwizzledSessionConfiguration()
         
         DebugHTTPProtocol.ignoreHosts = ignoreHosts
+        
         Debugger.shared.configurationSwitcherViewModel.onConfigurationSwitched = onConfigurationSwitched
-        Debugger.shared.applyCustomModification = applyCustomModification
+        
+        Debugger.shared.applyCustomRequestModification = applyCustomRequestModification
+        Debugger.shared.applyCustomResponseModification = applyCustomResponseModification
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             UIWindow.updateSystemWidgetVisibility(Debugger.shared.systemDebuggerViewModel.isShowWidget)
@@ -64,15 +75,41 @@ public final class Debugger: NSObject, ObservableObject {
         networkSnifferViewModel.save(request: request)
     }
     
-    func applyDebugSettings(to request: inout NSMutableURLRequest) {
+    func applyDebugSettings(to request: inout URLRequest) {
         guard let selectedConfiguration = configurationSwitcherViewModel.selectedConfiguration else {
             return
         }
         
-        requestModifierService.applyHostSpoofing(to: &request, selectedConfiguration: selectedConfiguration)
-        requestModifierService.applyCustomRules(selectedConfiguration.customRules, to: &request)
+        networkModifierService.applyHostSpoofing(
+            to: &request,
+            selectedConfiguration: selectedConfiguration
+        )
+        networkModifierService.apply(
+            rules: selectedConfiguration.customRules,
+            to: &request
+        )
         
-        applyCustomModification?(&request, selectedConfiguration.customRules)
+        applyCustomRequestModification?(selectedConfiguration.customRules, &request)
+    }
+    
+    func applyDebugSettings(to responseData: inout Data, on request: URLRequest) {
+        guard let selectedConfiguration = configurationSwitcherViewModel.selectedConfiguration else {
+            return
+        }
+        
+        networkModifierService.apply(
+            rules: selectedConfiguration.customRules,
+            to: &responseData,
+            on: request
+        )
+        
+        applyCustomResponseModification?(selectedConfiguration.customRules, &responseData, request)
+    }
+    
+    func isResponseWillBeModified(for request: URLRequest) -> Bool {
+        return (configurationSwitcherViewModel.selectedConfiguration?.customRules ?? [])
+            .filter { $0.type.isResponseType }
+            .contains { networkModifierService.isMatching(request: request, to: $0) }
     }
     
     func hideDebugger() {
