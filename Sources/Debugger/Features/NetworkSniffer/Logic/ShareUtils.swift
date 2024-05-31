@@ -27,30 +27,6 @@ final class ShareUtils {
         }
         
         return [text]
-//        let customItem = CustomActivity(title: "Save to the desktop", image: UIImage(named: "activity_icon", in: .main, compatibleWith: nil)) { (sharedItems) in
-//            guard let sharedStrings = sharedItems as? [String] else { return }
-//
-//            let appName = Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
-//
-//            let dateFormatterGet = DateFormatter()
-//            dateFormatterGet.dateFormat = "yyyyMMdd_HHmmss_SSS"
-//
-//            let suffix: String
-//            switch requestExportOption {
-//                case .flat:
-//                    suffix = "-wormholy.txt"
-//                case .curl:
-//                    suffix = "-wormholy.txt"
-//                case .postman:
-//                   suffix = "-postman_collection.json"
-//            }
-//
-//            let filename = "\(appName)_\(dateFormatterGet.string(from: Date()))\(suffix)"
-//
-//             for string in sharedStrings {
-//                 FileHandler.writeTxtFileOnDesktop(text: string, fileName: filename)
-//             }
-//         }
     }
         
     private static func getTxtText(requests: [RequestModel]) -> String {

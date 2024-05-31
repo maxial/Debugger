@@ -10,6 +10,6 @@ import UIKit
 extension UIApplication {
     static var animationSpeed: Float {
         get { UIWindow.keyWindow?.layer.speed ?? 1 }
-        set { UIWindow.keyWindow?.layer.speed = newValue }
+        set { UIWindow.allDebuggableWindows.forEach { $0.layer.speed = newValue } }
     }
 }

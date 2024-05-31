@@ -18,11 +18,13 @@ final class RequestModel: ObservableObject, Identifiable {
     @Published var httpBody: Data?
     @Published var code: Int?
     @Published var responseHeaders: [String: String]?
-    @Published var dataResponse: Data?
+    @Published private(set) var dataResponse: Data?
     @Published var errorClientDescription: String?
     @Published var duration: Double?
     @Published var sentBytes: Int64?
     @Published var receivedBytes: Int64?
+    
+    private let lock = NSLock()
     
     init(request: URLRequest, session: URLSession?) {
         id = UUID().uuidString
@@ -84,7 +86,9 @@ final class RequestModel: ObservableObject, Identifiable {
     }
     
     func saveDataResponse(data: Data) {
+        lock.lock()
         DispatchQueue.main.async { [weak self] in
+            defer { self?.lock.unlock() }
             guard let self else { return }
             if dataResponse == nil {
                 dataResponse = data
@@ -92,6 +96,12 @@ final class RequestModel: ObservableObject, Identifiable {
                 dataResponse?.append(data)
             }
         }
+    }
+    
+    func readDataResponse() -> Data? {
+        lock.lock()
+        defer { lock.unlock() }
+        return dataResponse
     }
     
     func saveHttpBody(from request: URLRequest) {

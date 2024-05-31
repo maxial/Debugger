@@ -88,7 +88,7 @@ extension NSObject {
             
             let propertyWrapper = PropertyWrapper(property: property)
             
-            guard let type = propertyWrapper.type, type != classForCoder, propertyWrapper.isStrong else {
+            guard let type = propertyWrapper.type, propertyWrapper.isStrong else {
                 continue
             }
             

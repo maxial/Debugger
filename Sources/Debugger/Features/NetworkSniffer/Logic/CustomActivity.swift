@@ -14,9 +14,7 @@ class CustomActivity: UIActivity {
     override var activityImage: UIImage? {
         return _activityImage
     }
-    override var activityType: UIActivity.ActivityType? {
-        return UIActivity.ActivityType(rawValue: "com.Wormholy.Wormholy-iOS")
-    }
+    
     override class var activityCategory: UIActivity.Category {
         return .action
     }

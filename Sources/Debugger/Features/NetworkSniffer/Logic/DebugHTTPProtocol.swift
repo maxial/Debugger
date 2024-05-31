@@ -114,27 +114,12 @@ extension DebugHTTPProtocol: URLSessionDataDelegate {
             currentRequest?.saveError(error.localizedDescription)
             
             client?.urlProtocol(self, didFailWithError: error)
-            
-            if let request = task.originalRequest, Debugger.shared.isResponseWillBeModified(for: request) {
-                print("DEBBUG: ERROR")
-            }
         } else {
             if let request = task.originalRequest, Debugger.shared.isResponseWillBeModified(for: request) {
-                if var responseData = currentRequest?.dataResponse {
+                if var responseData = currentRequest?.readDataResponse() {
                     Debugger.shared.applyDebugSettings(to: &responseData, on: request)
                     
-                    print("DEBBUG: ALL GOOD")
                     client?.urlProtocol(self, didLoad: responseData)
-                } else {
-                    print(currentRequest == nil ? "DEBBUG: nil currentRequest" : "DEBBUG: EMPTY RESPONSE")
-                }
-            } else {
-                if let request = task.originalRequest {
-                    if Debugger.shared.isResponseWillBeModified(for: request) == false {
-                        print("DEBBUG: Will NOT BeModified")
-                    }
-                } else {
-                    print("DEBBUG: originalRequest nil")
                 }
             }
             

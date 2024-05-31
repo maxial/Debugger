@@ -32,6 +32,7 @@ extension UIWindow {
         
         if UIWindow._debuggerWindow == nil || UIWindow._debuggerWindow?.isHidden == true {
             endEditing(true)
+            UIWindow.allDebuggableWindows.first?.makeKeyAndVisible()
             UIWindow.updateDebuggerVisibility(true)
         }
     }
@@ -79,7 +80,12 @@ extension UIWindow {
             _debuggerWindow?.frame.origin.y = isVisible ? .zero : _debuggerWindow?.frame.height ?? .zero
         }, completion: { isFinished in
             if isFinished && isVisible == false {
+                _debuggerController?.removeFromParent()
+                _debuggerController = nil
                 _debuggerWindow?.isHidden = true
+                _debuggerWindow?.rootViewController = nil
+                _debuggerWindow?.removeFromSuperview()
+                _debuggerWindow = nil
             }
         })
     }
