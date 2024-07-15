@@ -135,10 +135,9 @@ extension UIView {
                 let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
                 addGestureRecognizer(tapGestureRecognizer)
                 _tapGestureRecognizer = tapGestureRecognizer
+                _isUserInteractionEnabledBackup = isUserInteractionEnabled
+                isUserInteractionEnabled = true
             }
-            
-            _isUserInteractionEnabledBackup = isUserInteractionEnabled
-            isUserInteractionEnabled = true
         } else {
             if let _tapGestureRecognizer {
                 removeGestureRecognizer(_tapGestureRecognizer)

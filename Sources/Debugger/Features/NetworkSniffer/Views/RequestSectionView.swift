@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct RequestSectionView: View {
+    private enum Constants {
+        static let descriptionThreshold = 5000
+    }
+    
     var viewModel: RequestSectionViewModel
     
     var body: some View {
@@ -22,9 +26,23 @@ struct RequestSectionView: View {
                     Spacer()
                 }
                 HStack {
-                    highlight(searchText: viewModel.searchText, in: viewModel.description)
-                        .font(.system(size: 12))
-                        .foregroundColor(.label)
+                    if viewModel.description.count > Constants.descriptionThreshold {
+                        if let pdfUrl = createPdfUrl(text: viewModel.description) {
+                            NavigationLink(
+                                destination: RequestSectionLongView(pdfURL: pdfUrl),
+                                label: {
+                                    Text("Response Data")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.systemBlue)
+                                        .frame(height: 40)
+                                }
+                            )
+                        }
+                    } else {
+                        highlight(searchText: viewModel.searchText, in: viewModel.description)
+                            .font(.system(size: 12))
+                            .foregroundColor(.label)
+                    }
                     
                     Spacer()
                 }
@@ -72,6 +90,31 @@ struct RequestSectionView: View {
             
             return result ?? Text(text)
         }
+    }
+    
+    private func createPdfUrl(text: String) -> URL? {
+        let A4paperSize = CGSize(width: 595, height: 842)
+        let pdf = SimplePDF(pageSize: A4paperSize)
+        
+        pdf.addText(text)
+        
+        let pdfPath = getDocumentsDirectory().appendingPathComponent("sample.pdf")
+        
+        let pdfData = pdf.generatePDFdata()
+
+        do {
+            try pdfData.write(to: pdfPath, options: .atomic)
+            print("PDF создан по пути: \(pdfPath)")
+            return pdfPath
+        } catch {
+            print("Не удалось создать PDF: \(error)")
+            return nil
+        }
+    }
+    
+    private func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
     }
 }
 

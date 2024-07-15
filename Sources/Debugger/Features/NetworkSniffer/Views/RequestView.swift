@@ -27,7 +27,7 @@ struct RequestView: View {
     var body: some View {
         List {
             SearchBar(text: $searchText)
-                .listRow(backgroundColor: .clear)
+                .listRow(isEditable: false, backgroundColor: .clear)
             
             ForEach(RequestSection.allCases) { section in
                 RequestSectionView(viewModel: getRequestSectionViewModel(for: section))

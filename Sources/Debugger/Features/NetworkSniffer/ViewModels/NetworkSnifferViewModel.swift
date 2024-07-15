@@ -13,6 +13,8 @@ final class NetworkSnifferViewModel: ObservableObject {
     
     @Published var requests: [RequestModel] = []
     
+    var uniqueUrlPaths: [String] { getUniqueUrlPaths() }
+    
     func save(request: RequestModel) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -36,5 +38,11 @@ final class NetworkSnifferViewModel: ObservableObject {
             guard let self else { return }
             requests.removeAll()
         }
+    }
+    
+    private func getUniqueUrlPaths() -> [String] {
+        var set = Set<String>()
+        let uniqueArray = requests.compactMap { $0.url?.path }.filter { set.insert($0).inserted }
+        return uniqueArray
     }
 }

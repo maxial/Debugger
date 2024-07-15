@@ -17,11 +17,11 @@ struct NetworkSnifferView: View {
     var body: some View {
         List {
             SearchBar(text: $searchText)
-                .listRow(backgroundColor: .clear)
+                .listRow(isEditable: false, backgroundColor: .clear)
             
             ForEach(getFilteredRequests()) { request in
                 RequestItemView(requestModel: request)
-                    .listNavigationRow(destination: RequestView(requestModel: request))
+                    .listRow(isEditable: false, destination: RequestView(requestModel: request))
             }
             .onDelete(perform: removeRequests)
         }

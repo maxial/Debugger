@@ -1,21 +1,21 @@
 //
-//  ViewInspectorConfigurationView.swift
+//  OptionView.swift
 //
 //
-//  Created by Maxim Aliev on 04.05.2024.
+//  Created by Maxim Aliev on 03.06.2024.
 //
 
 import SwiftUI
 
-struct ViewInspectorConfigurationView: View {
-    var configuration: ViewInspectorConfiguration
-    var isSelected: Bool
+struct OptionView: View {
+    let option: String
+    let isSelected: Bool
     
     var body: some View {
         HStack {
-            Text(configuration.rawValue)
+            Text(option)
                 .foregroundColor(.label)
-                .padding(.vertical, 8)
+                .font(.system(size: 14))
             
             Spacer()
             
@@ -26,10 +26,10 @@ struct ViewInspectorConfigurationView: View {
                     .frame(width: 16, height: 16)
             }
         }
-        .listRow(isEditable: false)
+        .listRow(isEditable: true)
     }
 }
 
 #Preview {
-    ViewInspectorConfigurationView(configuration: .attributesInspector, isSelected: true)
+    OptionView(option: "Option", isSelected: true)
 }

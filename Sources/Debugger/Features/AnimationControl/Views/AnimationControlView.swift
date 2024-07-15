@@ -35,7 +35,7 @@ struct AnimationControlView: View {
                 .padding(.bottom, 16)
             }
         }
-        .listNavigationRow()
+        .listRow(isEditable: false)
         .onTapGesture {
             viewModel.isActivated.toggle()
         }

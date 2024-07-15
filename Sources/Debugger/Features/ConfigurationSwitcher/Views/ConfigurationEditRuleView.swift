@@ -27,8 +27,17 @@ struct ConfigurationEditRuleView: View {
             Section {
                 KeyValueView(
                     key: .constant("URL Path"),
-                    value: $viewModel.rule.path,
-                    isValueEditable: true
+                    value: .constant(viewModel.rule.path),
+                    isEditable: true
+                )
+                .listRow(
+                    isEditable: true,
+                    destination: OptionsView(
+                        title: "URL Path",
+                        options: Debugger.shared.uniqueUrlPaths,
+                        selectedOption: viewModel.rule.path,
+                        didSelectOption: { viewModel.rule.path = $0 }
+                    )
                 )
                 
                 ForEach(viewModel.rule.matchingParams.indices, id: \.self) { i in

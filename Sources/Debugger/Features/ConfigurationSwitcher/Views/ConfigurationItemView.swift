@@ -55,7 +55,7 @@ struct ConfigurationItemView: View {
                 }
             }
         }
-        .listNavigationRow()
+        .listRow(isEditable: false)
         .onAppear {
             isShowConfigurationInfo = false
         }

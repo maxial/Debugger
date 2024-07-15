@@ -26,7 +26,7 @@ struct DebuggerItemView<Destination>: View where Destination: View {
             }
         }
         .padding(.vertical, 8)
-        .listNavigationRow(destination: destination)
+        .listRow(isEditable: false, destination: destination)
     }
 }
 

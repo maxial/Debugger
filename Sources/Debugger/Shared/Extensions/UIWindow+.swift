@@ -130,7 +130,7 @@ extension UIWindow {
     }
     
     private static func createWidgetWindow() {
-        guard let scene = _scene, let keyWindow = keyWindow else {
+        guard let scene = _scene, let mainWindow = UIWindow.allDebuggableWindows.first else {
             return
         }
         
@@ -139,7 +139,7 @@ extension UIWindow {
         
         systemWidgetController.view.backgroundColor = .clear
         systemWidgetController.view.frame = CGRect(
-            origin: CGPoint(x: keyWindow.center.x - systemWidgetView.externalSize.width / 2, y: .zero),
+            origin: CGPoint(x: mainWindow.center.x - systemWidgetView.externalSize.width / 2, y: .zero),
             size: systemWidgetView.externalSize
         )
         
@@ -149,9 +149,9 @@ extension UIWindow {
         _widgetWindow?.windowLevel = UIWindow.Level.alert + 1
         _widgetWindow?.rootViewController = systemWidgetController
         
-        systemWidgetController.view.addGestureRecognizer(
+        _widgetWindow?.addGestureRecognizer(
             UIPanGestureRecognizer(
-                target: keyWindow,
+                target: mainWindow,
                 action: #selector(handleSystemWidgetPanGesture)
             )
         )
@@ -190,7 +190,7 @@ extension UIWindow {
     }
     
     @objc private func handleSystemWidgetPanGesture(_ gesture: UIPanGestureRecognizer) {
-        guard let window = gesture.view?.window else {
+        guard let window = gesture.view else {
             return
         }
         

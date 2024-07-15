@@ -22,6 +22,7 @@ public final class Debugger: NSObject, ObservableObject {
     static let shared = Debugger()
     
     var isDebuggerEnabled = false
+    var uniqueUrlPaths: [String] { networkSnifferViewModel.uniqueUrlPaths }
     
     @Published var configurationSwitcherViewModel: ConfigurationSwitcherViewModel
     @Published var networkSnifferViewModel: NetworkSnifferViewModel

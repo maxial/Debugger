@@ -23,7 +23,7 @@ struct KeyValueInfoView: View {
                 .foregroundColor(.secondary)
                 .font(.system(size: 13))
         }
-        .listRow()
+        .listRow(isEditable: false)
         .frame(height: 30)
     }
 }

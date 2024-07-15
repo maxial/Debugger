@@ -16,13 +16,13 @@ struct SystemDebuggerView: View {
                 Text("Show Widget On Screen")
             }
             .padding(.vertical, 4)
-            .listNavigationRow()
+            .listRow(isEditable: false)
             
             Toggle(isOn: $viewModel.isDetectLeaks) {
                 Text("Memory Leak Detection")
             }
             .padding(.vertical, 4)
-            .listNavigationRow()
+            .listRow(isEditable: false)
             
             Section(header: Text("Metrics").frame(height: .zero)) {
                 ForEach(viewModel.metrics) {

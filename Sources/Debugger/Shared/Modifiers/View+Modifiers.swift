@@ -12,31 +12,31 @@ extension View {
         modifier(ListModifier(backgroundColor: backgroundColor, cornerRadius: cornerRadius))
     }
     
-    func listRow(backgroundColor: Color? = nil) -> some View {
-        modifier(ListRowModifier(backgroundColor: backgroundColor))
-    }
-    
-    func listNavigationRow<Destination>(
-        backgroundColor: Color? = nil,
-        destination: Destination = EmptyView()
+    func listRow<Destination>(
+        isEditable: Bool,
+        destination: Destination = EmptyView(),
+        backgroundColor: Color? = nil
     ) -> some View where Destination: View {
         modifier(
-            ListNavigationRowModifier(
-                backgroundColor: backgroundColor,
-                destination: destination
+            ListRowModifier(
+                isEditable: isEditable,
+                destination: destination,
+                backgroundColor: backgroundColor
             )
         )
     }
     
-    func listNavigationRow<Destination>(
-        backgroundColor: Color? = nil,
+    func listRow<Destination>(
+        isEditable: Bool,
         destination: Destination = EmptyView(),
+        backgroundColor: Color? = nil,
         isActive: Binding<Bool>
     ) -> some View where Destination: View {
         modifier(
-            ListNavigationRowModifier(
-                backgroundColor: backgroundColor,
+            ListRowModifier(
+                isEditable: isEditable,
                 destination: destination,
+                backgroundColor: backgroundColor,
                 isActive: isActive
             )
         )

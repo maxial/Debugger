@@ -31,7 +31,8 @@ struct ConfigurationRuleView: View {
                 }
             }
         }
-        .listNavigationRow(
+        .listRow(
+            isEditable: false,
             destination: ConfigurationEditRuleView(
                 viewModel: viewModel,
                 ruleCompletion: updateRuleCompletion

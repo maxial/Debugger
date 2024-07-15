@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct KeyValueView: View {
-    private var isEditable: Bool { isKeyEditable || isValueEditable }
+    private var isEditableRow: Bool { isKeyEditable || isValueEditable || isEditable }
     
     @Binding var key: String
     @Binding var value: String
     var isKeyEditable = false
     var isValueEditable = false
+    var isEditable = false
     
     var body: some View {
         HStack {
@@ -38,8 +39,7 @@ struct KeyValueView: View {
                     .font(.system(size: 14))
             }
         }
-        .if(isEditable) { $0.listRow() }
-        .if(isEditable == false) { $0.listNavigationRow() }
+        .listRow(isEditable: isEditableRow)
     }
 }
 
